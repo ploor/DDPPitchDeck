@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Correlated Data Generator</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Correlated Data Generator">
+  <meta name="author" content="Derek Ploor">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>Correlated Data Generator</h1>
+    <h2>Coursera Developing Data Products Pitch Deck</h2>
+    <p>Derek Ploor<br/></p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <hgroup>
+    <h2>Description of the App</h2>
+  </hgroup>
+  <article data-timings="">
+    
+<div style='float:left;width:48%;' class='centered'>
+  <ul>
+<li>Purpose: To generate simulated datasets of 3 variables for a given correlation structure</li>
+<li>Features:
+
+<ul>
+<li>Control of number of records, variable names, and correlation structure</li>
+<li>Can download simulated data as a CSV file</li>
+<li>Can view a plot of the data</li>
+<li>User can set the random number generator seed, for reproducibility</li>
+</ul></li>
+<li>Basic logic for the data generation can be found at this <a href="http://www.r-bloggers.com/simulating-random-multivariate-correlated-data-continuous-variables/" title="Simulating Random Multivariate Correlated Data (Continuous Variables)">R-blogger post</a>.</li>
+</ul>
+
+</div>
+<div style='float:right;width:48%;'>
+  <ul>
+<li>The app is deployed at <a href="http://ploor.shinyapps.io/DDPShinyApp/">http://ploor.shinyapps.io/DDPShinyApp/</a>
+<img src="assets/img/app01_halfsize.png" alt="Application Screen Shot"></li>
+</ul>
+
+</div>
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-2" style="background:;">
+  <hgroup>
+    <h2>Data Generation Example</h2>
+  </hgroup>
+  <article data-timings="">
+    
+<div style='float:left;width:48%;' class='centered'>
+  <p>Input the following into the widgets:</p>
+
+<p><img src="assets/img/exampleConfig01_edit.png" alt="Example Configuration"></p>
+
+</div>
+<div style='float:right;width:48%;'>
+  <p>Click <img src="assets/img/GenerateData_button01.png" alt="Generate Data">, and a sampled plot of the data will display:</p>
+
+<p><img src="assets/img/plot01.png" alt="Data Plot"></p>
+
+</div>
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Downloading data and loading into R</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Click on <img src="assets/img/DownloadData_button01.png" alt="Download Data">, save the CSV file to your R working directory as <code>data.csv</code> (or another name).   The file can be easily read with R:</p>
+
+<pre><code class="r">data &lt;- read.csv(&quot;data.csv&quot;)
+cor(data)
+</code></pre>
+
+<pre><code>##            outcome predictor1 predictor2
+## outcome     1.0000    -0.7926     0.3893
+## predictor1 -0.7926     1.0000     0.2210
+## predictor2  0.3893     0.2210     1.0000
+</code></pre>
+
+<p>Notice how</p>
+
+<ul>
+<li>correlation between <code>outcome</code> and <code>predictor1</code> is close to the <code>-0.8</code> we specified</li>
+<li>correlation between <code>outcome</code> and <code>predictor2</code> is close to the <code>0.4</code> we specified</li>
+<li>correlation between <code>predictor1</code> and <code>predictor2</code> is close to the <code>0.2</code> we specified</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-4" style="background:;">
+  <hgroup>
+    <h2>Correlation structure</h2>
+  </hgroup>
+  <article data-timings="">
+    
+<div style='float:left;width:48%;' class='centered'>
+  <p>Configurations such as the following will lead to an error:</p>
+
+<p><img src="assets/img/badConfig01.png" alt="Bad Configuration"></p>
+
+<!--```{r, echo=FALSE}
+chol(matrix(cbind(1,-.80,.4,  -.80,1,.25,  .4,.25,1),nrow=3))
+```-->
+
+<p>This is because the following correlation matrix needs to be positive definite:
+\[
+\left(\begin{array}{@{}ccc@{}}
+                    1 & r_{12} & r_{13} \\
+                    r_{12} & 1 & r_{23} \\
+                    r_{13} & r_{23} & 1
+                  \end{array}\right)
+\]</p>
+
+</div>
+<div style='float:right;width:48%;'>
+  <p>The correlation matrix will be positive definite if, for example, \(r_{23}\) is in the following range:
+\[
+\begin{align*}
+r_{12}r_{13}-&\sqrt{(1-r^2_{12})(1-r^2_{13})} \\
+\le &r_{23} \le \\
+r_{12}r_{13}&+\sqrt{(1-r^2_{12})(1-r^2_{13})}
+\end{align*}
+\]</p>
+
+<p>The Shiny App assists in selecting valid combinations of correlations by reactively displaying the following output:
+<img src="assets/img/corrHelper01.png" alt="Correlation Helper"></p>
+
+</div>
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='Description of the App'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Data Generation Example'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='Downloading data and loading into R'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='Correlation structure'>
+         4
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+      }
+    });
+  </script>
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <!-- <script src="https://c328740.ssl.cf1.rackcdn.com/mathjax/2.0-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script> -->
+  <script>window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="libraries/widgets/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"><\/script>')
+</script>
+<!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>
